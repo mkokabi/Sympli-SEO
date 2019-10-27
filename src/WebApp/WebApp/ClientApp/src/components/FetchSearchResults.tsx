@@ -44,18 +44,18 @@ class FetchSearchResults extends React.PureComponent<SearchResultsProps> {
         <thead>
           <tr>
             <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
+            <th>URL</th>
+            <th>Kewords</th>
+            <th>Results</th>
           </tr>
         </thead>
         <tbody>
           {this.props.searchResults.map((searchResult: SearchResultstsStore.SearchResult) =>
             <tr key={searchResult.date}>
               <td>{searchResult.date}</td>
-              <td>{searchResult.temperatureC}</td>
-              <td>{searchResult.temperatureF}</td>
-              <td>{searchResult.summary}</td>
+              <td>{searchResult.url}</td>
+              <td>{searchResult.keywords.join("+")}</td>
+              <td>{searchResult.results.join(",")}</td>
             </tr>
           )}
         </tbody>

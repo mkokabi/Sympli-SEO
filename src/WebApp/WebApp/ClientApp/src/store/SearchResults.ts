@@ -12,9 +12,9 @@ export interface SearchResultsState {
 
 export interface SearchResult {
   date: string;
-  temperatureC: number;
-  temperatureF: number;
-  summary: string;
+  url: string;
+  keywords: string[];
+  results: number[];
 }
 
 // -----------------
