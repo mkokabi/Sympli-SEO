@@ -21,5 +21,16 @@ namespace Sympli.SEO.Services
             })
             .ToArray();
         }
+
+        public SearchResult Search(SearchParams searchParams)
+        {
+            return new SearchResult
+            {
+                Date = DateTime.Now,
+                Keywords = searchParams.Keywords,
+                Url = searchParams.Url,
+                Results = new int[] { 4, 5, 6 }
+            };
+        }
     }
 }

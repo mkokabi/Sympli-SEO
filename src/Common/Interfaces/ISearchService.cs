@@ -8,5 +8,6 @@ namespace Sympli.SEO.Common.Interfaces
     public interface ISearchService
     {
         IEnumerable<SearchResult> GetResults();
+        SearchResult Search(SearchParams searchParams);
     }
 }

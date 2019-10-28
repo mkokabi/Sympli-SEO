@@ -27,6 +27,12 @@ namespace Sympli.SEO.WebApp.Controllers
             return this.searchService.GetResults();
         }
 
+        [HttpPost]
+        public SearchResult Search([FromBody]SearchParams searchParams)
+        {
+            return this.searchService.Search(searchParams);
+        }
+
         [HttpGet("echo")]
         public string Echo(string input)
         {

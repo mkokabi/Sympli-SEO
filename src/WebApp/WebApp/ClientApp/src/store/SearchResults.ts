@@ -8,6 +8,9 @@ export interface SearchResultsState {
   isLoading: boolean;
   startDateIndex?: number;
   searchResults: SearchResult[];
+  isSearching: boolean;
+  searchResult: SearchResult;
+  searchParam: SearchParams;
 }
 
 export interface SearchResult {
@@ -15,6 +18,11 @@ export interface SearchResult {
   url: string;
   keywords: string[];
   results: number[];
+}
+
+export interface SearchParams {
+  url: string;
+  keywords: string[];
 }
 
 // -----------------
@@ -32,9 +40,19 @@ interface ReceiveSearchResultsAction {
   searchResults: SearchResult[];
 }
 
+interface StartingSearchAction {
+  type: 'STARTING_SEARCH';
+  searchParams: SearchParams;
+}
+
+interface SearchCompletedAction {
+  type: 'SEARCH_COMPLETED',
+  searchResult: SearchResult;
+}
+
 // Declare a 'discriminated union' type. This guarantees that all references to 'type' properties contain one of the
 // declared type strings (and not any other arbitrary string).
-type KnownAction = RequestSearchResultsAction | ReceiveSearchResultsAction;
+type KnownAction = RequestSearchResultsAction | ReceiveSearchResultsAction | StartingSearchAction | SearchCompletedAction;
 
 // ----------------
 // ACTION CREATORS - These are functions exposed to UI components that will trigger a state transition.
@@ -56,10 +74,36 @@ export const actionCreators = {
   }
 };
 
+export const searchActionCreators = {
+  postSearchRequest: (searchParams: SearchParams): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    const appState = getState();
+    if (appState) {
+      fetch(`/api/SearchResults`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({ url: searchParams.url, keywords: searchParams.keywords })
+      })
+        .then(response => response.json() as Promise<SearchResult>)
+        .then(data => {
+          dispatch({ type: 'SEARCH_COMPLETED', searchResult: data });
+        });
+
+      dispatch({ type: 'STARTING_SEARCH', searchParams: searchParams});
+    }
+  }
+}
+
 // ----------------
 // REDUCER - For a given state and action, returns the new state. To support time travel, this must not mutate the old state.
 
-const unloadedState: SearchResultsState = { searchResults: [], isLoading: false };
+const unloadedState: SearchResultsState = {
+  searchResults: [], isLoading: false, isSearching: false,
+  searchResult: { date: "", keywords: [], url: "", results: [] },
+  searchParam: { url: "", keywords: [] }
+};
 
 export const reducer: Reducer<SearchResultsState> = (state: SearchResultsState | undefined, incomingAction: Action): SearchResultsState => {
   if (state === undefined) {
@@ -72,7 +116,10 @@ export const reducer: Reducer<SearchResultsState> = (state: SearchResultsState |
       return {
         startDateIndex: action.startDateIndex,
         searchResults: state.searchResults,
-        isLoading: true
+        isLoading: true,
+        isSearching: false,
+        searchResult: state.searchResult,
+        searchParam: state.searchParam
       };
     case 'RECEIVE_SEARCH_RESULTS':
       // Only accept the incoming data if it matches the most recent request. This ensures we correctly
@@ -81,7 +128,10 @@ export const reducer: Reducer<SearchResultsState> = (state: SearchResultsState |
         return {
           startDateIndex: action.startDateIndex,
           searchResults: action.searchResults,
-          isLoading: false
+          isLoading: false,
+          isSearching: false,
+          searchResult: state.searchResult,
+          searchParam: state.searchParam
         };
       }
       break;
