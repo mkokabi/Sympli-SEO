@@ -9,6 +9,13 @@ namespace Sympli.SEO.Services
 {
     public class SearchService : ISearchService
     {
+        private readonly ISearchResultsProvider searchResultsProvider;
+
+        public SearchService(ISearchResultsProvider searchResultsProvider)
+        {
+            this.searchResultsProvider = searchResultsProvider;
+        }
+
         public IEnumerable<SearchResult> GetResults()
         {
             var rng = new Random();
@@ -24,6 +31,14 @@ namespace Sympli.SEO.Services
 
         public SearchResult Search(SearchParams searchParams)
         {
+            if (string.IsNullOrWhiteSpace(searchParams.Url))
+            {
+                throw new ArgumentOutOfRangeException("URL not provided");
+            }
+            if (!searchParams.Keywords.Any())
+            {
+                throw new ArgumentOutOfRangeException("There should be at least one keyword");
+            }
             return new SearchResult
             {
                 Date = DateTime.Now,
