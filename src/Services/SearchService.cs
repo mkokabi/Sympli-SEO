@@ -3,7 +3,7 @@ using Sympli.SEO.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Sympli.SEO.Services
 {
@@ -39,13 +39,40 @@ namespace Sympli.SEO.Services
             {
                 throw new ArgumentOutOfRangeException("There should be at least one keyword");
             }
+
+            var seResponse = this.searchResultsProvider.SearchForKeywords(searchParams.Keywords);
+            var allOccurences = BreakResponse(seResponse, this.searchResultsProvider.UrlInResultPattern);
+            var occurencesLoc = new List<int>(allOccurences.Length);
+            var urlInPattern = this.searchResultsProvider.UrlInResultPattern.Replace("{url}", searchParams.Url);
+            for (int i = 0; i < allOccurences.Count(); i++)
+            {
+                if (allOccurences[i].Equals(urlInPattern, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    occurencesLoc.Add(i);
+                }
+            }
             return new SearchResult
             {
                 Date = DateTime.Now,
                 Keywords = searchParams.Keywords,
                 Url = searchParams.Url,
-                Results = new int[] { 4, 5, 6 }
+                Results = occurencesLoc.ToArray()
             };
+        }
+
+        private string[] BreakResponse(string seResponse, string urlInResultPattern)
+        {
+            // TODO: Complete the regex pattern replacement
+            var pattern = urlInResultPattern.Replace("{url}", ".*?").Replace("/", @"\/");
+            var regex = new Regex(pattern);
+            var regexMatches = regex.Matches(seResponse);
+            var results = new List<string>(regexMatches.Count);
+            var enumerator = regexMatches.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                results.Add(enumerator.Current.ToString());
+            }
+            return results.ToArray();
         }
     }
 }

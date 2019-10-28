@@ -44,7 +44,7 @@ namespace ServiceUnitTests
             var result = searchService.Search(new SearchParams { Url = "myurl.com", Keywords = new string[] { "x", "y" } });
             result.Results.Should().HaveCount(2);
             result.Results[0].Should().Be(1);
-            result.Results[0].Should().Be(3);
+            result.Results[1].Should().Be(3);
         }
     }
 }
