@@ -36,10 +36,68 @@ namespace ServiceUnitTests
         }
 
         [Fact]
-        public void Search_Find_count_of_urls()
+        public void Search_Find_count_of_urls_in_divs_flat()
         {
             searchResultProvider.SearchForKeywords(Arg.Any<string[]>()).Returns("<div>x.com</div><div>myurl.com</div><div>y.com</div><div>myurl.com</div>");
             searchResultProvider.UrlInResultPattern.Returns("<div>{url}</div>");
+            var searchService = new SearchService(this.searchResultProvider);
+            var result = searchService.Search(new SearchParams { Url = "myurl.com", Keywords = new string[] { "x", "y" } });
+            result.Results.Should().HaveCount(2);
+            result.Results[0].Should().Be(1);
+            result.Results[1].Should().Be(3);
+        }
+
+        [Fact]
+        public void Search_Find_count_of_urls_in_divs_with_attr()
+        {
+            searchResultProvider.SearchForKeywords(Arg.Any<string[]>()).Returns(
+                @"<div at='1'>x.com</div><div at='1'>myurl.com</div><div at='1'>y.com</div><div at='1'>myurl.com</div>");
+            searchResultProvider.UrlInResultPattern.Returns("<div at='1'>{url}</div>");
+            var searchService = new SearchService(this.searchResultProvider);
+            var result = searchService.Search(new SearchParams { Url = "myurl.com", Keywords = new string[] { "x", "y" } });
+            result.Results.Should().HaveCount(2);
+            result.Results[0].Should().Be(1);
+            result.Results[1].Should().Be(3);
+        }
+
+        [Fact]
+        public void Search_Find_count_of_urls_in_nested_divs_with_attr()
+        {
+            searchResultProvider.SearchForKeywords(Arg.Any<string[]>()).Returns(@"<div at='1'><a l='x.com'></div>
+<div at='1'><a l='myurl.com'></div>
+<div at='1'><a l='y.com'></div>
+<div at='1'><a l='myurl.com'></div>");
+            searchResultProvider.UrlInResultPattern.Returns("<div at='1'><a l='{url}'></div>");
+            var searchService = new SearchService(this.searchResultProvider);
+            var result = searchService.Search(new SearchParams { Url = "myurl.com", Keywords = new string[] { "x", "y" } });
+            result.Results.Should().HaveCount(2);
+            result.Results[0].Should().Be(1);
+            result.Results[1].Should().Be(3);
+        }
+
+        [Fact]
+        public void Search_Find_count_of_urls_in_nested_divs_with_attr_double_quotes()
+        {
+            searchResultProvider.SearchForKeywords(Arg.Any<string[]>()).Returns(@"<div at=""1""><a l=""x.com""></div>
+<div at=""1""><a l=""myurl.com""></div>
+<div at=""1""><a l=""y.com""></div>
+<div at=""1""><a l=""myurl.com""></div>");
+            searchResultProvider.UrlInResultPattern.Returns(@"<div at=""1""><a l=""{url}""></div>");
+            var searchService = new SearchService(this.searchResultProvider);
+            var result = searchService.Search(new SearchParams { Url = "myurl.com", Keywords = new string[] { "x", "y" } });
+            result.Results.Should().HaveCount(2);
+            result.Results[0].Should().Be(1);
+            result.Results[1].Should().Be(3);
+        }
+
+        [Fact]
+        public void Search_Find_count_of_urls_in_nested_divs_with_attr_double_quotes_with_inner_pattern()
+        {
+            searchResultProvider.SearchForKeywords(Arg.Any<string[]>()).Returns(@"<div at=""1""><a l=""x.com""></div>
+<div at=""1""><a l=""myurl.com""></div>
+<div at=""1""><a l=""y.com""></div>
+<div at=""1""><a l=""myurl.com""></div>");
+            searchResultProvider.UrlInResultPattern.Returns(@"<a l=""{url}"">");
             var searchService = new SearchService(this.searchResultProvider);
             var result = searchService.Search(new SearchParams { Url = "myurl.com", Keywords = new string[] { "x", "y" } });
             result.Results.Should().HaveCount(2);
