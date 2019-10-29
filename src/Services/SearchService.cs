@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Sympli.SEO.Services
 {
@@ -16,20 +17,20 @@ namespace Sympli.SEO.Services
             this.searchResultsProvider = searchResultsProvider;
         }
 
-        public IEnumerable<SearchResult> GetResults()
+        public async Task<IEnumerable<SearchResult>> GetResults()
         {
             var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new SearchResult
+            return await Task.FromResult(Enumerable.Range(1, 5).Select(index => new SearchResult
             {
                 Date = DateTime.Now.AddDays(index),
                 Keywords = new[] { "Abc", "Def" },
                 Url = "www.abc.com",
                 Results = new int[] { 1, 3, 5 }
             })
-            .ToArray();
+            .ToArray());
         }
 
-        public SearchResult Search(SearchParams searchParams)
+        public async Task<SearchResult> Search(SearchParams searchParams)
         {
             if (string.IsNullOrWhiteSpace(searchParams.Url))
             {
@@ -40,7 +41,7 @@ namespace Sympli.SEO.Services
                 throw new ArgumentOutOfRangeException("There should be at least one keyword");
             }
 
-            var seResponse = this.searchResultsProvider.SearchForKeywords(searchParams.Keywords);
+            var seResponse = await this.searchResultsProvider.SearchForKeywords(searchParams.Keywords);
             var allOccurences = BreakResponse(seResponse, this.searchResultsProvider.UrlInResultPattern);
             var occurencesLoc = new List<int>(allOccurences.Length);
             var urlInPattern = this.searchResultsProvider.UrlInResultPattern.Replace("{url}", searchParams.Url);

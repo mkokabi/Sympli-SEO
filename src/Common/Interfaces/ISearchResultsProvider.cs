@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 
 namespace Sympli.SEO.Common.Interfaces
 {
     public interface ISearchResultsProvider
     {
-        string SearchForKeywords(string[] keywords);
+        Task<string> SearchForKeywords(string[] keywords);
         string UrlInResultPattern { get; }
     }
 }

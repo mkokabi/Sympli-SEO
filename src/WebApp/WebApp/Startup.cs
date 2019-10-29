@@ -29,6 +29,8 @@ namespace Sympli.SEO.WebApp
                 configuration.RootPath = "ClientApp/build";
             });
 
+            services.AddHttpClient();
+
             services.AddScoped<ISearchService, SearchService>();
             services.AddScoped<ISearchResultsProvider, SearchResultsProvider>();
         }

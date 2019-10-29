@@ -1,13 +1,12 @@
 ﻿using Sympli.SEO.Common.DataTypes;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Sympli.SEO.Common.Interfaces
 {
     public interface ISearchService
     {
-        IEnumerable<SearchResult> GetResults();
-        SearchResult Search(SearchParams searchParams);
+        Task<IEnumerable<SearchResult>> GetResults();
+        Task<SearchResult> Search(SearchParams searchParams);
     }
 }

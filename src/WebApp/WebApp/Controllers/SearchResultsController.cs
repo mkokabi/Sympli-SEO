@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Sympli.SEO.Common.DataTypes;
@@ -22,15 +21,15 @@ namespace Sympli.SEO.WebApp.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<SearchResult> Get()
+        public async Task<IEnumerable<SearchResult>> Get()
         {
-            return this.searchService.GetResults();
+            return await this.searchService.GetResults();
         }
 
         [HttpPost]
-        public SearchResult Search([FromBody]SearchParams searchParams)
+        public async Task<SearchResult> Search([FromBody]SearchParams searchParams)
         {
-            return this.searchService.Search(searchParams);
+            return await this.searchService.Search(searchParams);
         }
 
         [HttpGet("echo")]
