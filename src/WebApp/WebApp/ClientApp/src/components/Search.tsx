@@ -31,9 +31,6 @@ class Search extends React.PureComponent<SearchProps> {
     } else if (name == "keywords") {
       this.props.searchParam.keywords = value.split(',');
     }
-    this.setState({
-      [name]: value
-    });
   }
 
   onSearchClick(event: any) {
@@ -43,18 +40,47 @@ class Search extends React.PureComponent<SearchProps> {
   public render() {
     return (
       <React.Fragment>
-        <label>Enter the URL you are interested:</label>
-        <input type="text" name="url"
-          onChange={this.handleInputChange}
-        />
+        <div className="form-group">
+          <label>Enter the URL you are interested:</label>
+          <input type="text" name="url"
+            onChange={this.handleInputChange}
+          />
+        </div>
 
-        <label>Enter the keywords:</label>
-        <input type="text" name="keywords"
-          onChange={this.handleInputChange}
-        />
+        <div className="form-group">
+          <label>Enter the keywords:</label>
+          <input type="text" name="keywords"
+            onChange={this.handleInputChange}
+          />
+        </div>
 
         <Button type="button" className="btn btn-success" onClick={this.onSearchClick}>Search</Button>
+        {this.renderSearchResultsTable()}
+
       </React.Fragment>
+    );
+  }
+
+  private renderSearchResultsTable() {
+    return (
+      <table className='table table-striped' aria-labelledby="tabelLabel">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>URL</th>
+            <th>Kewords</th>
+            <th>Results</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr key={this.props.searchResult.date}>
+            <td>{this.props.searchResult.date}</td>
+            <td>{this.props.searchResult.url}</td>
+            <td>{this.props.searchResult.keywords.join("+")}</td>
+            <td>{this.props.searchResult.results.join(",")}</td>
+            </tr>
+        </tbody>
+      </table>
     );
   }
 }

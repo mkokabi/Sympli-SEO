@@ -135,6 +135,15 @@ export const reducer: Reducer<SearchResultsState> = (state: SearchResultsState |
         };
       }
       break;
+    case 'SEARCH_COMPLETED':
+      return {
+        startDateIndex: undefined,
+        searchResults: [],
+        isLoading: false,
+        isSearching: false,
+        searchResult: action.searchResult,
+        searchParam: state.searchParam
+      };
   }
 
   return state;
