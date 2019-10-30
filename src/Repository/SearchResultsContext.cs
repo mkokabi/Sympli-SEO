@@ -26,6 +26,7 @@ namespace Repository
             });
 
             modelBuilder.Entity<SearchResult>()
+                .ToTable("SearchResult")
                 .Ignore(b => b.Keywords)
                 .Ignore(b => b.Results);
         }
