@@ -14,3 +14,10 @@ The main players in this design are SearchResultProvider and SearchResultService
 
 ## User interface
 ![screenshot - 1](https://github.com/mkokabi/Sympli-SEO/blob/master/img/Screenshot-01.png "Screenshot - 1")
+
+## Assumptions
+- Google putting the found url in a tag like:
+```html
+<div class=""BNeawe UPmit AP7Wnd"">{url}</div>
+```
+- Some of the URLs would have a trailing part which is after ```&#8250;``` 
