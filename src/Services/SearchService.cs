@@ -11,10 +11,14 @@ namespace Sympli.SEO.Services
     public class SearchService : ISearchService
     {
         private readonly ISearchResultsProvider searchResultsProvider;
+        private readonly ISearchResultsRepo searchResultsRepo;
 
-        public SearchService(ISearchResultsProvider searchResultsProvider)
+        public SearchService(
+            ISearchResultsProvider searchResultsProvider,
+            ISearchResultsRepo searchResultsRepo)
         {
             this.searchResultsProvider = searchResultsProvider;
+            this.searchResultsRepo = searchResultsRepo;
         }
 
         public async Task<IEnumerable<SearchResult>> GetResults()
@@ -41,6 +45,11 @@ namespace Sympli.SEO.Services
                 throw new ArgumentOutOfRangeException("There should be at least one keyword");
             }
 
+            var similarSearchResult = await this.searchResultsRepo.GetLatestSimilar(new SearchResult { Keywords = searchParams.Keywords, Url = searchParams.Url});
+            if (similarSearchResult != null && similarSearchResult.Date.AddHours(1) > DateTime.Now)
+            {
+                return similarSearchResult;
+            }
             var seResponse = await this.searchResultsProvider.SearchForKeywords(searchParams.Keywords);
             var allOccurences = BreakResponse(seResponse, this.searchResultsProvider.UrlInResultPattern);
             var occurencesLoc = new List<int>(allOccurences.Length);
@@ -55,13 +64,15 @@ namespace Sympli.SEO.Services
                     occurencesLoc.Add(i);
                 }
             }
-            return new SearchResult
+            var result = new SearchResult
             {
                 Date = DateTime.Now,
                 Keywords = searchParams.Keywords,
                 Url = searchParams.Url,
                 Results = occurencesLoc.ToArray()
             };
+            await this.searchResultsRepo.Add(result);
+            return result;
         }
 
         private string[] BreakResponse(string seResponse, string urlInResultPattern)
