@@ -16,6 +16,7 @@ namespace ServiceUnitTests
         public SearchServiceTests()
         {
             searchResultProvider = Substitute.For<ISearchResultsProvider>();
+            searchResultProvider.RemoveTralier(Arg.Any<String>()).Returns(callInfo => callInfo.Args()[0]);
         }
 
         [Fact]

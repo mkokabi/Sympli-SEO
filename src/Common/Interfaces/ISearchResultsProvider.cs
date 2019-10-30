@@ -6,5 +6,6 @@ namespace Sympli.SEO.Common.Interfaces
     {
         Task<string> SearchForKeywords(string[] keywords);
         string UrlInResultPattern { get; }
+        string RemoveTralier(string withTrailer);
     }
 }

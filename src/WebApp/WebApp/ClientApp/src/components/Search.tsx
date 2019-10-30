@@ -77,7 +77,7 @@ class Search extends React.PureComponent<SearchProps> {
             <td>{this.props.searchResult.date}</td>
             <td>{this.props.searchResult.url}</td>
             <td>{this.props.searchResult.keywords.join("+")}</td>
-            <td>{this.props.searchResult.results.join(",")}</td>
+            <td>{this.props.searchResult.results.length}:[{this.props.searchResult.results.join(",")}]</td>
             </tr>
         </tbody>
       </table>

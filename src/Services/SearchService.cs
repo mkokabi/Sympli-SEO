@@ -48,7 +48,7 @@ namespace Sympli.SEO.Services
             for (int i = 0; i < allOccurences.Count(); i++)
             {
                 //remove trailer
-                var occurence = RemoveTralier(allOccurences[i]);
+                var occurence = this.searchResultsProvider.RemoveTralier(allOccurences[i]);
 
                 if (occurence.Equals(urlInPattern, StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -62,18 +62,6 @@ namespace Sympli.SEO.Services
                 Url = searchParams.Url,
                 Results = occurencesLoc.ToArray()
             };
-        }
-
-        private string RemoveTralier(string withTrailer)
-        {
-            var trailerStart = withTrailer.IndexOf(" &#8250; ");
-            if (trailerStart == -1)
-            {
-                return withTrailer;
-            }
-            var trailerEnd = withTrailer.IndexOf("<", trailerStart);
-            return withTrailer.Substring(0, trailerStart) + withTrailer.Substring(trailerEnd);
-
         }
 
         private string[] BreakResponse(string seResponse, string urlInResultPattern)
