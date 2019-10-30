@@ -7,7 +7,7 @@ namespace Repository
 {
     public class SearchResultsContext : DbContext
     {
-        public DbSet<SearchResult> SearchResults;
+        public DbSet<SearchResult> SearchResults { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
