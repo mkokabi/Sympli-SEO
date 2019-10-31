@@ -30,7 +30,9 @@ namespace Repository
         {
             var keywordsJoined = string.Join(",", searchResult.Keywords);
             return await context
-                .SearchResults.Where(sr => sr.KeywordsJoined == keywordsJoined && sr.Url == searchResult.Url)
+                .SearchResults
+                .AsNoTracking()
+                .Where(sr => sr.KeywordsJoined == keywordsJoined && sr.Url == searchResult.Url)
                 .OrderByDescending(sr => sr.Date)
                 .SingleOrDefaultAsync();
         }

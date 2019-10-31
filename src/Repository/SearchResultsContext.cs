@@ -7,7 +7,7 @@ namespace Repository
 {
     public class SearchResultsContext : DbContext
     {
-        public DbSet<SearchResult> SearchResults;
+        public DbSet<SearchResult> SearchResults { get; set; }
 
         public SearchResultsContext(DbContextOptions<SearchResultsContext> dbContextOptions) :
             base(dbContextOptions)
@@ -31,6 +31,7 @@ namespace Repository
             });
 
             modelBuilder.Entity<SearchResult>()
+                .ToTable("SearchResult")
                 .Ignore(b => b.Keywords)
                 .Ignore(b => b.Results);
         }
