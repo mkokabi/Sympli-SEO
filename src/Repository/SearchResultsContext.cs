@@ -9,6 +9,11 @@ namespace Repository
     {
         public DbSet<SearchResult> SearchResults;
 
+        public SearchResultsContext(DbContextOptions<SearchResultsContext> dbContextOptions) :
+            base(dbContextOptions)
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Filename=SOE_Database.db", options =>

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,8 +33,11 @@ namespace Sympli.SEO.WebApp
 
             services.AddHttpClient();
 
-            services.AddDbContext<SearchResultsContext>();// options =>
-                //options.Use(Configuration.GetConnectionString("DefaultConnection")));
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<SearchResultsContext>(options =>
+                options.UseSqlite(connectionString));
+
+            services.AddDbContext<SearchResultsContext>(options => options.UseInMemoryDatabase("InMem"));
 
             services.AddScoped<ISearchResultsRepo, SearchResultsRepo>();
             services.AddScoped<ISearchService, SearchService>();
