@@ -12,10 +12,6 @@ namespace Sympli.SEO.Common.DataTypes
 
         public string[] Keywords { get; set; }
 
-        public string KeywordsJoined { get; set; }
-
         public int[] Results { get; set; }
-
-        public string ResultsJoined { get; set; }
     }
 }

@@ -20,21 +20,67 @@ namespace Repository
 
         public async Task Add(SearchResult searchResult)
         {
-            searchResult.KeywordsJoined = string.Join(",", searchResult.Keywords);
-            searchResult.ResultsJoined = string.Join(",", searchResult.Results.Select(r => r.ToString()));
-            context.SearchResults.Add(searchResult);
+            var searchId = Guid.NewGuid();
+            var searchDate = DateTime.Now;
+            context.Searches.Add(
+                new Model.Search
+                {
+                    Id = searchId,
+                    Keywords = string.Join(",", searchResult.Keywords),
+                    DateTime = searchDate,
+                    Url = searchResult.Url,
+                    SearchEngineId = 1
+                });
+            context.SearchResults.Add(
+                new Model.SearchResult { 
+                    SearchResultId = Guid.NewGuid(),
+                    Result = string.Join(",", searchResult.Results.Select(r => r.ToString())),
+                    DateTime = searchDate,
+                    SearchId = searchId
+                });
+            await context.SaveChangesAsync();
+        }
+
+        public async Task AddResult(Guid searchId, SearchResult searchResult)
+        {
+            context.SearchResults.Add(
+                new Model.SearchResult
+                {
+                    SearchResultId = Guid.NewGuid(),
+                    Result = string.Join(",", searchResult.Results.Select(r => r.ToString())),
+                    DateTime = DateTime.Now,
+                    SearchId = searchId
+                });
             await context.SaveChangesAsync();
         }
 
         public async Task<SearchResult> GetLatestSimilar(SearchResult searchResult)
         {
             var keywordsJoined = string.Join(",", searchResult.Keywords);
-            return await context
+            var foundSearch = await context
+                .Searches
+                .AsNoTracking()
+                .Where(s => s.Keywords == keywordsJoined && s.Url == searchResult.Url)
+                .OrderByDescending(sr => sr.DateTime)
+                .SingleOrDefaultAsync();
+            if (foundSearch == null)
+            {
+                return null;
+            }
+            var foundSearchResult = await context
                 .SearchResults
                 .AsNoTracking()
-                .Where(sr => sr.KeywordsJoined == keywordsJoined && sr.Url == searchResult.Url)
-                .OrderByDescending(sr => sr.Date)
+                .Where(sr => sr.SearchId == foundSearch.Id)
+                .OrderByDescending(sr => sr.DateTime)
                 .SingleOrDefaultAsync();
+
+            return new SearchResult
+            {
+                Date = foundSearchResult.DateTime,
+                Keywords = foundSearch.Keywords.Split(","),
+                Url = foundSearch.Url,
+                Results = foundSearchResult.Result.Split(",").Select(s => int.Parse(s)).ToArray()
+            };
         }
     }
 }

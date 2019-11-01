@@ -33,11 +33,9 @@ namespace Sympli.SEO.WebApp
 
             services.AddHttpClient();
 
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            var connectionString = Configuration.GetConnectionString("SEODatabase");
             services.AddDbContext<SearchResultsContext>(options =>
                 options.UseSqlite(connectionString));
-
-            services.AddDbContext<SearchResultsContext>(options => options.UseInMemoryDatabase("InMem"));
 
             services.AddScoped<ISearchResultsRepo, SearchResultsRepo>();
             services.AddScoped<ISearchService, SearchService>();
@@ -49,6 +47,7 @@ namespace Sympli.SEO.WebApp
         {
             if (env.IsDevelopment())
             {
+                UpdateDatabase(app);
                 app.UseDeveloperExceptionPage();
             }
             else
@@ -80,6 +79,19 @@ namespace Sympli.SEO.WebApp
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+        }
+
+        private static void UpdateDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<SearchResultsContext>())
+                {
+                    context.Database.Migrate();
+                }
+            }
         }
     }
 }

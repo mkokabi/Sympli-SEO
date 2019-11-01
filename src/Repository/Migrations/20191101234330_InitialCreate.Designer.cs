@@ -9,7 +9,7 @@ using Repository;
 namespace Repository.Migrations
 {
     [DbContext(typeof(SearchResultsContext))]
-    [Migration("20191030121334_InitialCreate")]
+    [Migration("20191101234330_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,25 +18,45 @@ namespace Repository.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.0.0");
 
-            modelBuilder.Entity("Sympli.SEO.Common.DataTypes.SearchResult", b =>
+            modelBuilder.Entity("Repository.Model.Search", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("DateTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("KeywordsJoined")
+                    b.Property<string>("Keywords")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ResultsJoined")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("SearchEngineId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Url")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.ToTable("Search");
+                });
+
+            modelBuilder.Entity("Repository.Model.SearchResult", b =>
+                {
+                    b.Property<Guid>("SearchResultId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Result")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("SearchId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("SearchResultId");
 
                     b.ToTable("SearchResult");
                 });
