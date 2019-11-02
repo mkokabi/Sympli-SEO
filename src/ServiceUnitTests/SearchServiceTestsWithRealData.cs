@@ -14,9 +14,13 @@ namespace ServiceUnitTests
     {
         private ISearchResultsProvider searchResultProvider;
 
+        private ISearchResultsRepo searchResultsRepo;
+
         public SearchServiceTestsWithRealData()
         {
             searchResultProvider = Substitute.For<ISearchResultsProvider>();
+
+            searchResultsRepo = Substitute.For<ISearchResultsRepo>();
         }
 
         [Fact]
@@ -26,7 +30,7 @@ namespace ServiceUnitTests
             searchResultProvider.RemoveTralier(Arg.Any<String>()).Returns(callInfo => callInfo.Args()[0]);
             searchResultProvider.UrlInResultPattern.Returns(@"<div class=""BNeawe UPmit AP7Wnd"">{url}</div>");
 
-            var searchService = new SearchService(this.searchResultProvider);
+            var searchService = new SearchService(this.searchResultProvider, this.searchResultsRepo);
             var result = await searchService.Search(new SearchParams { Url = "https://keywordtool.io", Keywords = new string[] { "test", "keywords" } });
             result.Results.Should().HaveCount(1);
             result.Results[0].Should().Be(0);
@@ -50,7 +54,7 @@ namespace ServiceUnitTests
             searchResultProvider.RemoveTralier(Arg.Any<String>()).Returns(callInfo => RemoveTralier(callInfo.Args()[0].ToString()));
             searchResultProvider.UrlInResultPattern.Returns(@"<div class=""BNeawe UPmit AP7Wnd"">{url}</div>");
 
-            var searchService = new SearchService(this.searchResultProvider);
+            var searchService = new SearchService(this.searchResultProvider, this.searchResultsRepo);
             var result = await searchService.Search(new SearchParams { Url = "https://moz.com", Keywords = new string[] { "test", "keywords" } });
             result.Results.Should().HaveCount(1);
             result.Results[0].Should().Be(3);

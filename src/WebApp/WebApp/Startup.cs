@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Repository;
 using Sympli.SEO.Common.Interfaces;
 using Sympli.SEO.Services;
 
@@ -31,6 +33,11 @@ namespace Sympli.SEO.WebApp
 
             services.AddHttpClient();
 
+            var connectionString = Configuration.GetConnectionString("SEODatabase");
+            services.AddDbContext<SearchResultsContext>(options =>
+                options.UseSqlite(connectionString));
+
+            services.AddScoped<ISearchResultsRepo, SearchResultsRepo>();
             services.AddScoped<ISearchService, SearchService>();
             services.AddScoped<ISearchResultsProvider, SearchResultsProvider>();
         }
@@ -40,6 +47,7 @@ namespace Sympli.SEO.WebApp
         {
             if (env.IsDevelopment())
             {
+                UpdateDatabase(app);
                 app.UseDeveloperExceptionPage();
             }
             else
@@ -71,6 +79,19 @@ namespace Sympli.SEO.WebApp
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+        }
+
+        private static void UpdateDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
+            {
+                using (var context = serviceScope.ServiceProvider.GetService<SearchResultsContext>())
+                {
+                    context.Database.Migrate();
+                }
+            }
         }
     }
 }
