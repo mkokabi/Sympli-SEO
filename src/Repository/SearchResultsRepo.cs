@@ -79,7 +79,9 @@ namespace Repository
                 Date = foundSearchResult.DateTime,
                 Keywords = foundSearch.Keywords.Split(","),
                 Url = foundSearch.Url,
-                Results = foundSearchResult.Result.Split(",").Select(s => int.Parse(s)).ToArray()
+                Results = foundSearchResult
+                    .Result.Split(",", StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.Parse(s)).ToArray()
             };
         }
     }
