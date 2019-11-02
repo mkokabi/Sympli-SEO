@@ -4,6 +4,8 @@ namespace Sympli.SEO.Common.DataTypes
 {
     public class SearchResult
     {
+        public Guid Id { get; set; }
+
         public DateTime Date { get; set; }
 
         public string Url { get; set; }
