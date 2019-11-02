@@ -16,13 +16,6 @@ namespace Repository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Search>(entity =>
-                entity.HasKey(s => s.Id)
-            ); ;
-            modelBuilder.Entity<SearchResult>(entity =>
-            {
-                entity.HasKey(sr => sr.SearchResultId);
-            });
 
             modelBuilder.Entity<Search>()
                 .ToTable("Search");

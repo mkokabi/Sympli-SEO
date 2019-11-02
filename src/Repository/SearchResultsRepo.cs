@@ -84,5 +84,24 @@ namespace Repository
                     .Select(s => int.Parse(s)).ToArray()
             };
         }
+
+        public async Task<IEnumerable<SearchResult>> GetResults(int pageIndex, int pageSize)
+        {
+            return (await this.context
+                .SearchResults
+                .Include(sr => sr.Search)
+                .AsNoTracking()
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync())
+                .Select(s => new SearchResult
+                {
+                    Date = s.DateTime,
+                    Keywords = s.Search.Keywords.Split(',', StringSplitOptions.RemoveEmptyEntries),
+                    Url = s.Search.Url,
+                    Results = s.Result.Split(",", StringSplitOptions.RemoveEmptyEntries)
+                        .Select(s => int.Parse(s)).ToArray()
+                });
+        }
     }
 }

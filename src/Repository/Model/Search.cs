@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Repository.Model
 {
@@ -9,5 +10,6 @@ namespace Repository.Model
         public string Keywords { get; set; }
         public DateTime DateTime { get; set; }
         public int SearchEngineId { get; set; }
+        public IEnumerable<SearchResult> Results { get; set; }
     }
 }

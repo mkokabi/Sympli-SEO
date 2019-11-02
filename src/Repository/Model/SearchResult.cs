@@ -8,5 +8,6 @@ namespace Repository.Model
         public Guid SearchId { get; set; }
         public DateTime DateTime { get; set; }
         public string Result { get; set; }
+        public Search Search { get; set; }
     }
 }
