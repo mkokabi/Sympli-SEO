@@ -24,15 +24,6 @@ namespace Sympli.SEO.Services
         public async Task<IEnumerable<SearchResult>> GetResults()
         {
             return await this.searchResultsRepo.GetResults(1, 10);
-            //var rng = new Random();
-            //return await Task.FromResult(Enumerable.Range(1, 5).Select(index => new SearchResult
-            //{
-            //    Date = DateTime.Now.AddDays(index),
-            //    Keywords = new[] { "Abc", "Def" },
-            //    Url = "www.abc.com",
-            //    Results = new int[] { 1, 3, 5 }
-            //})
-            //.ToArray());
         }
 
         public async Task<SearchResult> Search(SearchParams searchParams)

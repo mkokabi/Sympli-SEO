@@ -26,9 +26,9 @@ class Search extends React.PureComponent<SearchProps> {
     const value = target.value;
     const name = target.name;
 
-    if (name == "url") {
+    if (name === "url") {
       this.props.searchParam.url = value;
-    } else if (name == "keywords") {
+    } else if (name === "keywords") {
       this.props.searchParam.keywords = value.split(',');
     }
   }

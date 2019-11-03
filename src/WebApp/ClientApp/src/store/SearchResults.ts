@@ -63,7 +63,7 @@ export const actionCreators = {
     // Only load data if it's something we don't already have (and are not already loading)
     const appState = getState();
     if (appState && appState.searchResults && startDateIndex !== appState.searchResults.startDateIndex) {
-      fetch(`/api/SearchResults`)
+      fetch(process.env.REACT_APP_BACKEND_API_URL + `/api/SearchResults`)
         .then(response => response.json() as Promise<SearchResult[]>)
         .then(data => {
           dispatch({ type: 'RECEIVE_SEARCH_RESULTS', startDateIndex: startDateIndex, searchResults: data });
@@ -78,7 +78,7 @@ export const searchActionCreators = {
   postSearchRequest: (searchParams: SearchParams): AppThunkAction<KnownAction> => (dispatch, getState) => {
     const appState = getState();
     if (appState) {
-      fetch(`/api/SearchResults`, {
+      fetch(process.env.REACT_APP_BACKEND_API_URL + `/api/SearchResults`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
