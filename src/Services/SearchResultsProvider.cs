@@ -29,7 +29,7 @@ namespace Sympli.SEO.Services
         public async Task<string> SearchForKeywords(string[] keywords)
         {
             var httpClient = this.httpClientFactory.CreateClient();
-            var httpResponse = await httpClient.GetAsync($"https://google.com/search?q={string.Join("+", keywords)}");
+            var httpResponse = await httpClient.GetAsync($"https://google.com/search?q={string.Join("+", keywords)}&num=100");
             var responseStr = await httpResponse.Content.ReadAsStringAsync();
             return responseStr;
         }
