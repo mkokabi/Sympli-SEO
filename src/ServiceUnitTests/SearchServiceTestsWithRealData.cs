@@ -59,5 +59,31 @@ namespace ServiceUnitTests
             result.Results.Should().HaveCount(1);
             result.Results[0].Should().Be(3);
         }
+
+        [Fact]
+        public async Task Google_search_for_test_keywords_while_result_has_trailer_without_scheme()
+        {
+            searchResultProvider.SearchForKeywords(Arg.Any<string[]>()).Returns(File.ReadAllText("SearchResponse_01.html"));
+            searchResultProvider.RemoveTralier(Arg.Any<String>()).Returns(callInfo => RemoveTralier(callInfo.Args()[0].ToString()));
+            searchResultProvider.UrlInResultPattern.Returns(@"<div class=""BNeawe UPmit AP7Wnd"">{url}</div>");
+
+            var searchService = new SearchService(this.searchResultProvider, this.searchResultsRepo);
+            var result = await searchService.Search(new SearchParams { Url = "moz.com", Keywords = new string[] { "test", "keywords" } });
+            result.Results.Should().HaveCount(1);
+            result.Results[0].Should().Be(3);
+        }
+
+        [Fact]
+        public async Task Google_search_for_test_keywords_while_result_has_trailer_with_different_scheme()
+        {
+            searchResultProvider.SearchForKeywords(Arg.Any<string[]>()).Returns(File.ReadAllText("SearchResponse_01.html"));
+            searchResultProvider.RemoveTralier(Arg.Any<String>()).Returns(callInfo => RemoveTralier(callInfo.Args()[0].ToString()));
+            searchResultProvider.UrlInResultPattern.Returns(@"<div class=""BNeawe UPmit AP7Wnd"">{url}</div>");
+
+            var searchService = new SearchService(this.searchResultProvider, this.searchResultsRepo);
+            var result = await searchService.Search(new SearchParams { Url = "http://moz.com", Keywords = new string[] { "test", "keywords" } });
+            result.Results.Should().HaveCount(1);
+            result.Results[0].Should().Be(3);
+        }
     }
 }

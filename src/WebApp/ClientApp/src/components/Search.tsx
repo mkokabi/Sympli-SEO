@@ -9,7 +9,7 @@ import * as SearchResultstsStore from '../store/SearchResults';
 type SearchProps =
   SearchResultstsStore.SearchResultsState // ... state we've requested from the Redux store
   & typeof SearchResultstsStore.searchActionCreators // ... plus action creators we've requested
-  & RouteComponentProps<{ startDateIndex: string }>; // ... plus incoming routing parameters
+  & RouteComponentProps<{ startIndex: string }>; // ... plus incoming routing parameters
 
 
 class Search extends React.PureComponent<SearchProps> {

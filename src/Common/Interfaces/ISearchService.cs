@@ -6,7 +6,7 @@ namespace Sympli.SEO.Common.Interfaces
 {
     public interface ISearchService
     {
-        Task<IEnumerable<SearchResult>> GetResults();
+        Task<PagedResponse<SearchResult>> GetResults(int startIndex, int pageSize);
         Task<SearchResult> Search(SearchParams searchParams);
     }
 }

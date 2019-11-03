@@ -9,7 +9,7 @@ import * as SearchResultstsStore from '../store/SearchResults';
 type SearchResultsProps =
   SearchResultstsStore.SearchResultsState // ... state we've requested from the Redux store
   & typeof SearchResultstsStore.actionCreators // ... plus action creators we've requested
-  & RouteComponentProps<{ startDateIndex: string }>; // ... plus incoming routing parameters
+  & RouteComponentProps<{ startIndex: string }>; // ... plus incoming routing parameters
 
 
 class FetchSearchResults extends React.PureComponent<SearchResultsProps> {
@@ -34,8 +34,8 @@ class FetchSearchResults extends React.PureComponent<SearchResultsProps> {
   }
 
   private ensureDataFetched() {
-    const startDateIndex = parseInt(this.props.match.params.startDateIndex, 10) || 0;
-    this.props.requestSearchResults(startDateIndex);
+    const startIndex = parseInt(this.props.match.params.startIndex, 10) || 0;
+    this.props.requestSearchResults(startIndex);
   }
 
   private renderSearchResultsTable() {
@@ -50,7 +50,7 @@ class FetchSearchResults extends React.PureComponent<SearchResultsProps> {
           </tr>
         </thead>
         <tbody>
-          {this.props.searchResults.map((searchResult: SearchResultstsStore.SearchResult) =>
+          {this.props.searchResults.results.map((searchResult: SearchResultstsStore.SearchResult) =>
             <tr key={searchResult.date}>
               <td>{searchResult.date}</td>
               <td>{searchResult.url}</td>
@@ -64,16 +64,18 @@ class FetchSearchResults extends React.PureComponent<SearchResultsProps> {
   }
 
   private renderPagination() {
-    const prevStartDateIndex = (this.props.startDateIndex || 0) - 5;
-    const nextStartDateIndex = (this.props.startDateIndex || 0) + 5;
+    const prevstartIndex = (this.props.startIndex || 0) - 5;
+    const nextstartIndex = (this.props.startIndex || 0) + 5;
 
     return (
       <div className="d-flex justify-content-between">
-        {prevStartDateIndex >= 0 ?
-          <Link className='btn btn-sm btn-info' to={`/fetch-data/${prevStartDateIndex}`}>Previous</Link>
+        {prevstartIndex >= 0 ?
+          <Link className='btn btn-sm btn-info' to={`/fetch-data/${prevstartIndex}`}>Previous</Link>
           : <button className='btn btn-light btn-sm' disabled>Previous</button>}
         {this.props.isLoading && <span>Loading...</span>}
-        <Link className='btn btn-info btn-sm' to={`/fetch-data/${nextStartDateIndex}`}>Next</Link>
+        {(this.props.searchResults.length - (this.props.startIndex || 0) > 5) ?
+          <Link className='btn btn-info btn-sm' to={`/fetch-data/${nextstartIndex}`}>Next</Link>
+          : <button className='btn btn-light btn-sm' disabled>Next</button>}
       </div>
     );
   }

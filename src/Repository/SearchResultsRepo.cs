@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Sympli.SEO.Common;
 using Sympli.SEO.Common.DataTypes;
 using Sympli.SEO.Common.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Repository
@@ -85,13 +84,13 @@ namespace Repository
             };
         }
 
-        public async Task<IEnumerable<SearchResult>> GetResults(int pageIndex, int pageSize)
+        public async Task<PagedResponse<SearchResult>> GetResults(int startIndex, int pageSize)
         {
-            return (await this.context
+            var searchResults = (await this.context
                 .SearchResults
                 .Include(sr => sr.Search)
                 .AsNoTracking()
-                .Skip((pageIndex - 1) * pageSize)
+                .Skip(startIndex)
                 .Take(pageSize)
                 .ToListAsync())
                 .Select(s => new SearchResult
@@ -102,6 +101,12 @@ namespace Repository
                     Results = s.Result.Split(",", StringSplitOptions.RemoveEmptyEntries)
                         .Select(s => int.Parse(s)).ToArray()
                 });
+            var totalCounts = await this.context.SearchResults.CountAsync();
+            return new PagedResponse<SearchResult>
+            {
+                Length = totalCounts,
+                Results = searchResults
+            };
         }
     }
 }

@@ -6,11 +6,16 @@ import { AppThunkAction } from '.';
 
 export interface SearchResultsState {
   isLoading: boolean;
-  startDateIndex?: number;
-  searchResults: SearchResult[];
+  startIndex?: number;
+  searchResults: PagedSearchResults;
   isSearching: boolean;
   searchResult: SearchResult;
   searchParam: SearchParams;
+}
+
+export interface PagedSearchResults {
+  length: number;
+  results: SearchResult[];
 }
 
 export interface SearchResult {
@@ -31,13 +36,13 @@ export interface SearchParams {
 
 interface RequestSearchResultsAction {
   type: 'REQUEST_SEARCH_RESULTS';
-  startDateIndex: number;
+  startIndex: number;
 }
 
 interface ReceiveSearchResultsAction {
   type: 'RECEIVE_SEARCH_RESULTS';
-  startDateIndex: number;
-  searchResults: SearchResult[];
+  startIndex: number;
+  searchResults: PagedSearchResults;
 }
 
 interface StartingSearchAction {
@@ -59,17 +64,17 @@ type KnownAction = RequestSearchResultsAction | ReceiveSearchResultsAction | Sta
 // They don't directly mutate state, but they can have external side-effects (such as loading data).
 
 export const actionCreators = {
-  requestSearchResults: (startDateIndex: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+  requestSearchResults: (startIndex: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
     // Only load data if it's something we don't already have (and are not already loading)
     const appState = getState();
-    if (appState && appState.searchResults && startDateIndex !== appState.searchResults.startDateIndex) {
-      fetch(process.env.REACT_APP_BACKEND_API_URL + `/api/SearchResults`)
-        .then(response => response.json() as Promise<SearchResult[]>)
+    if (appState && appState.searchResults && startIndex !== appState.searchResults.startIndex) {
+      fetch(process.env.REACT_APP_BACKEND_API_URL + `/api/SearchResults?startIndex=` + startIndex + `&pageSize=5`)
+        .then(response => response.json() as Promise<PagedSearchResults>)
         .then(data => {
-          dispatch({ type: 'RECEIVE_SEARCH_RESULTS', startDateIndex: startDateIndex, searchResults: data });
+          dispatch({ type: 'RECEIVE_SEARCH_RESULTS', startIndex: startIndex, searchResults: { length: data.length, results: data.results } });
         });
 
-      dispatch({ type: 'REQUEST_SEARCH_RESULTS', startDateIndex: startDateIndex });
+      dispatch({ type: 'REQUEST_SEARCH_RESULTS', startIndex: startIndex });
     }
   }
 };
@@ -100,7 +105,7 @@ export const searchActionCreators = {
 // REDUCER - For a given state and action, returns the new state. To support time travel, this must not mutate the old state.
 
 const unloadedState: SearchResultsState = {
-  searchResults: [], isLoading: false, isSearching: false,
+  searchResults: { length: 0, results: [] }, isLoading: false, isSearching: false,
   searchResult: { date: "", keywords: [], url: "", results: [] },
   searchParam: { url: "", keywords: [] }
 };
@@ -114,7 +119,7 @@ export const reducer: Reducer<SearchResultsState> = (state: SearchResultsState |
   switch (action.type) {
     case 'REQUEST_SEARCH_RESULTS':
       return {
-        startDateIndex: action.startDateIndex,
+        startIndex: action.startIndex,
         searchResults: state.searchResults,
         isLoading: true,
         isSearching: false,
@@ -124,10 +129,13 @@ export const reducer: Reducer<SearchResultsState> = (state: SearchResultsState |
     case 'RECEIVE_SEARCH_RESULTS':
       // Only accept the incoming data if it matches the most recent request. This ensures we correctly
       // handle out-of-order responses.
-      if (action.startDateIndex === state.startDateIndex) {
+      if (action.startIndex === state.startIndex) {
         return {
-          startDateIndex: action.startDateIndex,
-          searchResults: action.searchResults,
+          startIndex: action.startIndex,
+          searchResults: {
+            length: action.searchResults.length,
+            results: action.searchResults.results
+          },
           isLoading: false,
           isSearching: false,
           searchResult: state.searchResult,
@@ -137,8 +145,8 @@ export const reducer: Reducer<SearchResultsState> = (state: SearchResultsState |
       break;
     case 'SEARCH_COMPLETED':
       return {
-        startDateIndex: undefined,
-        searchResults: [],
+        startIndex: undefined,
+        searchResults: { length: 0, results: [] },
         isLoading: false,
         isSearching: false,
         searchResult: action.searchResult,

@@ -9,6 +9,6 @@ import './custom.css'
 export default () => (
     <Layout>
         <Route exact path='/' component={Home} />
-        <Route path='/fetch-data/:startDateIndex?' component={FetchSearchResults} />
+        <Route path='/fetch-data/:startIndex?' component={FetchSearchResults} />
     </Layout>
 );

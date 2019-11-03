@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Sympli.SEO.Common;
 using Sympli.SEO.Common.DataTypes;
 using Sympli.SEO.Common.Interfaces;
 
@@ -21,9 +21,9 @@ namespace Sympli.SEO.WebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<SearchResult>> Get()
+        public async Task<PagedResponse<SearchResult>> Get(int startIndex, int pageSize)
         {
-            return await this.searchService.GetResults();
+            return await this.searchService.GetResults(startIndex, pageSize);
         }
 
         [HttpPost]

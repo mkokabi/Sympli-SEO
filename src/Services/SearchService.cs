@@ -1,4 +1,5 @@
-﻿using Sympli.SEO.Common.DataTypes;
+﻿using Sympli.SEO.Common;
+using Sympli.SEO.Common.DataTypes;
 using Sympli.SEO.Common.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -21,9 +22,9 @@ namespace Sympli.SEO.Services
             this.searchResultsRepo = searchResultsRepo;
         }
 
-        public async Task<IEnumerable<SearchResult>> GetResults()
+        public async Task<PagedResponse<SearchResult>> GetResults(int startIndex, int pageSize)
         {
-            return await this.searchResultsRepo.GetResults(1, 10);
+            return await this.searchResultsRepo.GetResults(startIndex, pageSize);
         }
 
         public async Task<SearchResult> Search(SearchParams searchParams)
@@ -37,7 +38,8 @@ namespace Sympli.SEO.Services
                 throw new ArgumentOutOfRangeException("There should be at least one keyword");
             }
 
-            var similarSearchResult = await this.searchResultsRepo.GetLatestSimilar(new SearchResult { Keywords = searchParams.Keywords, Url = searchParams.Url});
+            var similarSearchResult = await this.searchResultsRepo.GetLatestSimilar(
+                new SearchResult { Keywords = searchParams.Keywords, Url = searchParams.Url});
             if (similarSearchResult != null && similarSearchResult.Date.AddHours(1) > DateTime.Now)
             {
                 return similarSearchResult;
@@ -45,13 +47,15 @@ namespace Sympli.SEO.Services
             var seResponse = await this.searchResultsProvider.SearchForKeywords(searchParams.Keywords);
             var allOccurences = BreakResponse(seResponse, this.searchResultsProvider.UrlInResultPattern);
             var occurencesLoc = new List<int>(allOccurences.Length);
-            var urlInPattern = this.searchResultsProvider.UrlInResultPattern.Replace("{url}", searchParams.Url);
+            var patternParts = this.searchResultsProvider.UrlInResultPattern.Split(new[] { "{url}" }, StringSplitOptions.RemoveEmptyEntries);
+            var beforePart = patternParts[0];
+            var afterPart = patternParts[1];
             for (int i = 0; i < allOccurences.Count(); i++)
             {
                 //remove trailer
                 var occurence = this.searchResultsProvider.RemoveTralier(allOccurences[i]);
-
-                if (occurence.Equals(urlInPattern, StringComparison.InvariantCultureIgnoreCase))
+                occurence = occurence.Replace(beforePart, "").Replace(afterPart, "");
+                if (SameDomain(occurence, searchParams.Url))
                 {
                     occurencesLoc.Add(i);
                 }
@@ -65,6 +69,23 @@ namespace Sympli.SEO.Services
             };
             await this.searchResultsRepo.Add(result);
             return result;
+        }
+
+        private bool SameDomain(string occurence, string searchUrl)
+        {
+            if (occurence.Equals(searchUrl, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return true;
+            }
+            if (Uri.TryCreate(occurence, UriKind.Absolute, out Uri occurenceUri))
+            {
+                if (Uri.TryCreate(searchUrl, UriKind.Absolute, out Uri searchUrlUri))
+                {
+                    return occurenceUri.DnsSafeHost.Equals(searchUrlUri.DnsSafeHost, StringComparison.InvariantCultureIgnoreCase);
+                }
+                return occurenceUri.DnsSafeHost.Equals(searchUrl, StringComparison.OrdinalIgnoreCase);
+            }
+            return false;
         }
 
         private string[] BreakResponse(string seResponse, string urlInResultPattern)
