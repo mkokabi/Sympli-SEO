@@ -10,18 +10,22 @@ Creating an application that counts the number of a URL returned in the search r
 The process' flow would start from front-end. Here use enters some keywords just like using any search engine. In addition he would provide the URL which he is intersted in its performance. Then front-end would send all of those to the backend. Backend would first try to find the analysed results in the cache and serve the front-end by returning the cached data. Otherwise, it would call the search-engine and get the results and copy them into the cach and return them to the front-end.
 
 ## Design
-The main players in this design are SearchResultProvider and SearchResultService. The former send the request to a search engine and get the response while the later analyse the response. There would be one implimentation of the former (SearchEngineProvider) for other search engines like Bing.
+The main players in this design are SearchResultProvider and SearchResultService. The former send the request to a search engine and get the response while the later analyse the response. Currently, there is only one implimentation of the former (SearchEngineProvider) for Google but other search engines like Bing could have other implementation.
 
-### Extensions:
-The other player would be the repository which would store all the results in the database. The caching would be based on the latest stored result in the database whether it's less than an hour ago.
+The other player is the repository which stores all the results in the database. The caching is based on the latest stored result in the database whether it's less than an hour old or not.
 
 ## Technology stack
 - The front-end is using React and Redux. 
-- The back-end is using ASP.Net Core 3.0.
-- The database would be SQLite.
+- The back-end is using ASP.Net Core 3.0 and Entity Frame work 3.0. 
+- The database is SQLite.
 
 ## User interface
+### Main search page
 ![screenshot - 1](https://github.com/mkokabi/Sympli-SEO/blob/master/img/Screenshot-01.png "Screenshot - 1")
+
+### Get search restuls page
+![screenshot - 2](https://github.com/mkokabi/Sympli-SEO/blob/master/img/Screenshot-02.png "Screenshot - 2")
+
 
 ## Assumptions
 - Google putting the found url in a tag like:
