@@ -53,8 +53,9 @@ class Search extends React.PureComponent<SearchProps> {
             onChange={this.handleInputChange}
           />
         </div>
-
-        <Button type="button" className="btn btn-success" onClick={this.onSearchClick}>Search</Button>
+        {this.props.isSearching ?
+          <p>Searching</p> :
+          <Button type="button" className="btn btn-success" onClick={this.onSearchClick}>Search</Button>}
         {this.renderSearchResultsTable()}
 
       </React.Fragment>

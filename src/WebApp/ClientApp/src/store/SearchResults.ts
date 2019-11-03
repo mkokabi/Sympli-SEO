@@ -143,6 +143,17 @@ export const reducer: Reducer<SearchResultsState> = (state: SearchResultsState |
         };
       }
       break;
+    case 'STARTING_SEARCH':
+      return {
+        startIndex: undefined,
+        searchResults: { length: 0, results: [] },
+        isLoading: false,
+        isSearching: true,
+        searchResult: {
+          url: '', date: '', keywords: [], results: []
+        },
+        searchParam: state.searchParam
+      };
     case 'SEARCH_COMPLETED':
       return {
         startIndex: undefined,
