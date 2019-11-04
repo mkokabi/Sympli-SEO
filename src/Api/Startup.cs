@@ -65,6 +65,8 @@ namespace Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(this.Configuration).CreateLogger();
+
             app.UseSwagger();
 
             if (env.IsDevelopment())
