@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Repository;
+using Serilog;
 using Sympli.SEO.Common.Interfaces;
 using Sympli.SEO.Services;
 
@@ -70,6 +71,8 @@ namespace Api
                 UpdateDatabase(app);
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSerilogRequestLogging(); 
 
             app.UseHttpsRedirection();
 

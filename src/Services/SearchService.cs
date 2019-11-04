@@ -1,4 +1,5 @@
-﻿using Sympli.SEO.Common;
+﻿using Microsoft.Extensions.Logging;
+using Sympli.SEO.Common;
 using Sympli.SEO.Common.DataTypes;
 using Sympli.SEO.Common.Interfaces;
 using System;
@@ -14,12 +15,16 @@ namespace Sympli.SEO.Services
         private readonly ISearchResultsProvider[] searchResultsProviders;
         private readonly ISearchResultsRepo searchResultsRepo;
 
+        public ILoggerFactory LoggerFactory { get; }
+
         public SearchService(
             IEnumerable<ISearchResultsProvider> searchResultsProviders,
-            ISearchResultsRepo searchResultsRepo)
+            ISearchResultsRepo searchResultsRepo,
+            ILoggerFactory loggerFactory)
         {
             this.searchResultsProviders = searchResultsProviders.ToArray();
             this.searchResultsRepo = searchResultsRepo;
+            LoggerFactory = loggerFactory;
         }
 
         public async Task<PagedResponse<SearchResult>> GetResults(int startIndex, int pageSize)
@@ -41,6 +46,9 @@ namespace Sympli.SEO.Services
             {
                 throw new ArgumentOutOfRangeException("Invalid searchEngineIndex");
             }
+
+            var logger = this.LoggerFactory.CreateLogger<SearchService>();
+            logger.LogDebug("Search params {searchParams}", searchParams);
 
             var similarSearchResult = await this.searchResultsRepo.GetLatestSimilar(
                 new SearchParams { Keywords = searchParams.Keywords, Url = searchParams.Url, SearchEngineIndex = searchEngineIndex});

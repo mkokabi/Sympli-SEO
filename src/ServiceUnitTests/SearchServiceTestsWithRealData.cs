@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Sympli.SEO.Common.DataTypes;
 using Sympli.SEO.Common.Interfaces;
@@ -17,11 +19,16 @@ namespace ServiceUnitTests
 
         private ISearchResultsRepo searchResultsRepo;
 
+        private ILoggerFactory loggerFactory;
+
         public SearchServiceTestsWithRealData()
         {
             searchResultProvider = Substitute.For<ISearchResultsProvider>();
 
             searchResultsRepo = Substitute.For<ISearchResultsRepo>();
+
+            loggerFactory = Substitute.For<ILoggerFactory>();
+            loggerFactory.CreateLogger("").Returns(NullLogger.Instance);
         }
 
         [Fact]
@@ -31,7 +38,7 @@ namespace ServiceUnitTests
             searchResultProvider.RemoveTralier(Arg.Any<String>()).Returns(callInfo => callInfo.Args()[0]);
             searchResultProvider.UrlInResultPattern.Returns(@"<div class=""BNeawe UPmit AP7Wnd"">{url}</div>");
 
-            var searchService = new SearchService(new[] { this.searchResultProvider }, this.searchResultsRepo);
+            var searchService = new SearchService(new[] { this.searchResultProvider }, this.searchResultsRepo, this.loggerFactory);
             var result = await searchService.Search(new SearchParams { Url = "https://keywordtool.io", Keywords = new string[] { "test", "keywords" } });
             result.Results.Should().HaveCount(1);
             result.Results[0].Should().Be(0);
@@ -55,7 +62,7 @@ namespace ServiceUnitTests
             searchResultProvider.RemoveTralier(Arg.Any<String>()).Returns(callInfo => RemoveTralier(callInfo.Args()[0].ToString()));
             searchResultProvider.UrlInResultPattern.Returns(@"<div class=""BNeawe UPmit AP7Wnd"">{url}</div>");
 
-            var searchService = new SearchService(new[] { this.searchResultProvider }, this.searchResultsRepo);
+            var searchService = new SearchService(new[] { this.searchResultProvider }, this.searchResultsRepo, this.loggerFactory);
             var result = await searchService.Search(new SearchParams { Url = "https://moz.com", Keywords = new string[] { "test", "keywords" } });
             result.Results.Should().HaveCount(1);
             result.Results[0].Should().Be(3);
@@ -68,7 +75,7 @@ namespace ServiceUnitTests
             searchResultProvider.RemoveTralier(Arg.Any<String>()).Returns(callInfo => RemoveTralier(callInfo.Args()[0].ToString()));
             searchResultProvider.UrlInResultPattern.Returns(@"<div class=""BNeawe UPmit AP7Wnd"">{url}</div>");
 
-            var searchService = new SearchService(new[] { this.searchResultProvider }, this.searchResultsRepo);
+            var searchService = new SearchService(new[] { this.searchResultProvider }, this.searchResultsRepo, this.loggerFactory);
             var result = await searchService.Search(new SearchParams { Url = "moz.com", Keywords = new string[] { "test", "keywords" } });
             result.Results.Should().HaveCount(1);
             result.Results[0].Should().Be(3);
@@ -81,7 +88,7 @@ namespace ServiceUnitTests
             searchResultProvider.RemoveTralier(Arg.Any<String>()).Returns(callInfo => RemoveTralier(callInfo.Args()[0].ToString()));
             searchResultProvider.UrlInResultPattern.Returns(@"<div class=""BNeawe UPmit AP7Wnd"">{url}</div>");
 
-            var searchService = new SearchService(new[] { this.searchResultProvider }, this.searchResultsRepo);
+            var searchService = new SearchService(new[] { this.searchResultProvider }, this.searchResultsRepo, this.loggerFactory);
             var result = await searchService.Search(new SearchParams { Url = "http://moz.com", Keywords = new string[] { "test", "keywords" } });
             result.Results.Should().HaveCount(1);
             result.Results[0].Should().Be(3);
@@ -99,7 +106,7 @@ namespace ServiceUnitTests
             searchResultProvider.RemoveTralier(Arg.Any<String>()).Returns(callInfo => BingTrailerRemover(callInfo.Args()[0].ToString()));
             searchResultProvider.UrlInResultPattern.Returns(@"<cite>{url}</cite>");
 
-            var searchService = new SearchService(new[] { this.searchResultProvider }, this.searchResultsRepo);
+            var searchService = new SearchService(new[] { this.searchResultProvider }, this.searchResultsRepo, this.loggerFactory);
             var result = await searchService.Search(new SearchParams { Url = "www.sporcle.com", Keywords = new string[] { "test", "keywords" } });
             result.Results.Should().HaveCount(1);
             result.Results[0].Should().Be(31);
