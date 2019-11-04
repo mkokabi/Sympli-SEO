@@ -33,3 +33,7 @@ The other player is the repository which stores all the results in the database.
 <div class=""BNeawe UPmit AP7Wnd"">{url}</div>
 ```
 - Some of the URLs would have a trailing part which is after ```&#8250;``` 
+
+## Logging
+Application is using Serilog and Seq
+![screenshot - 3](https://github.com/mkokabi/Sympli-SEO/blob/master/img/Screenshot-03.png "Screenshot - 3")
