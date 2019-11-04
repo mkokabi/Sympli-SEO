@@ -30,11 +30,17 @@ class Search extends React.PureComponent<SearchProps> {
       this.props.searchParam.url = value;
     } else if (name === "keywords") {
       this.props.searchParam.keywords = value.split(',');
+    } else if (name === "searchEngine") {
+      this.props.searchParam.searchEngineIndex = value;
     }
   }
 
   onSearchClick(event: any) {
-    this.props.postSearchRequest({ url: this.props.searchParam.url, keywords: this.props.searchParam.keywords });
+    this.props.postSearchRequest({
+      url: this.props.searchParam.url,
+      keywords: this.props.searchParam.keywords,
+      searchEngineIndex: this.props.searchParam.searchEngineIndex
+    });
   }
 
   public render() {
@@ -52,6 +58,15 @@ class Search extends React.PureComponent<SearchProps> {
           <input type="text" name="keywords"
             onChange={this.handleInputChange}
           />
+        </div>
+
+        <div className="form-group">
+          <label>Select the Search Engine:</label>
+          <select name="searchEngine"
+            onChange={this.handleInputChange} >
+            <option value="0">Google</option>
+            <option value="1">Bing</option>
+          </select>
         </div>
         {this.props.isSearching ?
           <p>Searching</p> :

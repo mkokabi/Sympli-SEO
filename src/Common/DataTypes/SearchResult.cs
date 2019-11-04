@@ -6,6 +6,8 @@ namespace Sympli.SEO.Common.DataTypes
     {
         public Guid Id { get; set; }
 
+        public int SearchEngineIndex { get; set; }
+
         public DateTime Date { get; set; }
 
         public string Url { get; set; }

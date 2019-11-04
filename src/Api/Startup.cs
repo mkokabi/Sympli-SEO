@@ -55,7 +55,9 @@ namespace Api
 
             services.AddScoped<ISearchResultsRepo, SearchResultsRepo>();
             services.AddScoped<ISearchService, SearchService>();
-            services.AddScoped<ISearchResultsProvider, SearchResultsProvider>();
+
+            services.AddScoped<ISearchResultsProvider, GoogleSearchResultsProvider>();
+            services.AddScoped<ISearchResultsProvider, BingSearchResultProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

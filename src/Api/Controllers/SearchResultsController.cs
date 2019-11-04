@@ -26,10 +26,10 @@ namespace Sympli.SEO.WebApp.Controllers
             return await this.searchService.GetResults(startIndex, pageSize);
         }
 
-        [HttpPost]
-        public async Task<SearchResult> Search([FromBody]SearchParams searchParams)
+        [HttpPost("{searchEngineIndex}")]
+        public async Task<SearchResult> Search([FromBody]SearchParams searchParams, [FromRoute]int searchEngineIndex)
         {
-            return await this.searchService.Search(searchParams);
+            return await this.searchService.Search(searchParams, searchEngineIndex);
         }
 
         [HttpGet("echo")]

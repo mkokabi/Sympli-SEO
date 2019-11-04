@@ -11,14 +11,14 @@ namespace Sympli.SEO.Services
 {
     public class SearchService : ISearchService
     {
-        private readonly ISearchResultsProvider searchResultsProvider;
+        private readonly ISearchResultsProvider[] searchResultsProviders;
         private readonly ISearchResultsRepo searchResultsRepo;
 
         public SearchService(
-            ISearchResultsProvider searchResultsProvider,
+            IEnumerable<ISearchResultsProvider> searchResultsProviders,
             ISearchResultsRepo searchResultsRepo)
         {
-            this.searchResultsProvider = searchResultsProvider;
+            this.searchResultsProviders = searchResultsProviders.ToArray();
             this.searchResultsRepo = searchResultsRepo;
         }
 
@@ -27,7 +27,7 @@ namespace Sympli.SEO.Services
             return await this.searchResultsRepo.GetResults(startIndex, pageSize);
         }
 
-        public async Task<SearchResult> Search(SearchParams searchParams)
+        public async Task<SearchResult> Search(SearchParams searchParams, int searchEngineIndex = 0)
         {
             if (string.IsNullOrWhiteSpace(searchParams.Url))
             {
@@ -37,23 +37,29 @@ namespace Sympli.SEO.Services
             {
                 throw new ArgumentOutOfRangeException("There should be at least one keyword");
             }
+            if (searchEngineIndex < 0 || searchEngineIndex >= this.searchResultsProviders.Length)
+            {
+                throw new ArgumentOutOfRangeException("Invalid searchEngineIndex");
+            }
 
             var similarSearchResult = await this.searchResultsRepo.GetLatestSimilar(
-                new SearchResult { Keywords = searchParams.Keywords, Url = searchParams.Url});
+                new SearchParams { Keywords = searchParams.Keywords, Url = searchParams.Url, SearchEngineIndex = searchEngineIndex});
             if (similarSearchResult != null && similarSearchResult.Date.AddHours(1) > DateTime.Now)
             {
                 return similarSearchResult;
             }
-            var seResponse = await this.searchResultsProvider.SearchForKeywords(searchParams.Keywords);
-            var allOccurences = BreakResponse(seResponse, this.searchResultsProvider.UrlInResultPattern);
+            var seResponse = await this.searchResultsProviders[searchEngineIndex].SearchForKeywords(searchParams.Keywords);
+            var allOccurences = BreakResponse(seResponse, this.searchResultsProviders[searchEngineIndex].UrlInResultPattern);
             var occurencesLoc = new List<int>(allOccurences.Length);
-            var patternParts = this.searchResultsProvider.UrlInResultPattern.Split(new[] { "{url}" }, StringSplitOptions.RemoveEmptyEntries);
+            var patternParts = this
+                .searchResultsProviders[searchEngineIndex]
+                .UrlInResultPattern.Split(new[] { "{url}" }, StringSplitOptions.RemoveEmptyEntries);
             var beforePart = patternParts[0];
             var afterPart = patternParts[1];
             for (int i = 0; i < allOccurences.Count(); i++)
             {
                 //remove trailer
-                var occurence = this.searchResultsProvider.RemoveTralier(allOccurences[i]);
+                var occurence = this.searchResultsProviders[searchEngineIndex].RemoveTralier(allOccurences[i]);
                 occurence = occurence.Replace(beforePart, "").Replace(afterPart, "");
                 if (SameDomain(occurence, searchParams.Url))
                 {
@@ -67,7 +73,7 @@ namespace Sympli.SEO.Services
                 Url = searchParams.Url,
                 Results = occurencesLoc.ToArray()
             };
-            await this.searchResultsRepo.Add(result);
+            await this.searchResultsRepo.Add(searchParams, result);
             return result;
         }
 

@@ -35,6 +35,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\development.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Repository\Repository.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />

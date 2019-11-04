@@ -45,6 +45,7 @@ class FetchSearchResults extends React.PureComponent<SearchResultsProps> {
           <tr>
             <th>Date</th>
             <th>URL</th>
+            <th>SearchEngine</th>
             <th>Kewords</th>
             <th>Results</th>
           </tr>
@@ -54,6 +55,7 @@ class FetchSearchResults extends React.PureComponent<SearchResultsProps> {
             <tr key={searchResult.date}>
               <td>{searchResult.date}</td>
               <td>{searchResult.url}</td>
+              <td>{searchResult.searchEngineIndex === 0 ? "Google" : "Bing"}</td>
               <td>{searchResult.keywords.join("+")}</td>
               <td>{searchResult.results.join(",")}</td>
             </tr>

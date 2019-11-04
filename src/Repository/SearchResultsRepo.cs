@@ -17,7 +17,7 @@ namespace Repository
             this.context = context;
         }
 
-        public async Task Add(SearchResult searchResult)
+        public async Task Add(SearchParams searchParams, SearchResult searchResult)
         {
             var searchId = Guid.NewGuid();
             var searchDate = DateTime.Now;
@@ -28,7 +28,7 @@ namespace Repository
                     Keywords = string.Join(",", searchResult.Keywords),
                     DateTime = searchDate,
                     Url = searchResult.Url,
-                    SearchEngineId = 1
+                    SearchEngineId = searchParams.SearchEngineIndex
                 });
             context.SearchResults.Add(
                 new Model.SearchResult { 
@@ -53,13 +53,13 @@ namespace Repository
             await context.SaveChangesAsync();
         }
 
-        public async Task<SearchResult> GetLatestSimilar(SearchResult searchResult)
+        public async Task<SearchResult> GetLatestSimilar(SearchParams searchParams)
         {
-            var keywordsJoined = string.Join(",", searchResult.Keywords);
+            var keywordsJoined = string.Join(",", searchParams.Keywords);
             var foundSearch = await context
                 .Searches
                 .AsNoTracking()
-                .Where(s => s.Keywords == keywordsJoined && s.Url == searchResult.Url)
+                .Where(s => s.Keywords == keywordsJoined && s.Url == searchParams.Url && s.SearchEngineId == searchParams.SearchEngineIndex)
                 .OrderByDescending(sr => sr.DateTime)
                 .SingleOrDefaultAsync();
             if (foundSearch == null)
@@ -97,6 +97,7 @@ namespace Repository
                 {
                     Date = s.DateTime,
                     Keywords = s.Search.Keywords.Split(',', StringSplitOptions.RemoveEmptyEntries),
+                    SearchEngineIndex = s.Search.SearchEngineId,
                     Url = s.Search.Url,
                     Results = s.Result.Split(",", StringSplitOptions.RemoveEmptyEntries)
                         .Select(s => int.Parse(s)).ToArray()

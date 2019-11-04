@@ -21,6 +21,7 @@ export interface PagedSearchResults {
 export interface SearchResult {
   date: string;
   url: string;
+  searchEngineIndex: number;
   keywords: string[];
   results: number[];
 }
@@ -28,6 +29,7 @@ export interface SearchResult {
 export interface SearchParams {
   url: string;
   keywords: string[];
+  searchEngineIndex: number;
 }
 
 // -----------------
@@ -83,7 +85,7 @@ export const searchActionCreators = {
   postSearchRequest: (searchParams: SearchParams): AppThunkAction<KnownAction> => (dispatch, getState) => {
     const appState = getState();
     if (appState) {
-      fetch(process.env.REACT_APP_BACKEND_API_URL + `/api/SearchResults`, {
+      fetch(process.env.REACT_APP_BACKEND_API_URL + `/api/SearchResults/` + searchParams.searchEngineIndex, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -106,8 +108,8 @@ export const searchActionCreators = {
 
 const unloadedState: SearchResultsState = {
   searchResults: { length: 0, results: [] }, isLoading: false, isSearching: false,
-  searchResult: { date: "", keywords: [], url: "", results: [] },
-  searchParam: { url: "", keywords: [] }
+  searchResult: { date: "", keywords: [], url: "", searchEngineIndex: 0, results: [] },
+  searchParam: { url: "", keywords: [], searchEngineIndex: 0 }
 };
 
 export const reducer: Reducer<SearchResultsState> = (state: SearchResultsState | undefined, incomingAction: Action): SearchResultsState => {
@@ -150,7 +152,7 @@ export const reducer: Reducer<SearchResultsState> = (state: SearchResultsState |
         isLoading: false,
         isSearching: true,
         searchResult: {
-          url: '', date: '', keywords: [], results: []
+          url: '', searchEngineIndex: 0, date: '', keywords: [], results: []
         },
         searchParam: state.searchParam
       };

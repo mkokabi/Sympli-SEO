@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace Sympli.SEO.Services
 {
-    public class SearchResultsProvider : ISearchResultsProvider
+    public class GoogleSearchResultsProvider : ISearchResultsProvider
     {
         private readonly IHttpClientFactory httpClientFactory;
 
-        public SearchResultsProvider(IHttpClientFactory httpClientFactory)
+        public GoogleSearchResultsProvider(IHttpClientFactory httpClientFactory)
         {
             this.httpClientFactory = httpClientFactory;
         }

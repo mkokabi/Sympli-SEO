@@ -32,14 +32,6 @@ namespace Sympli.SEO.WebApp
             });
 
             services.AddHttpClient();
-
-            var connectionString = Configuration.GetConnectionString("SEODatabase");
-            services.AddDbContext<SearchResultsContext>(options =>
-                options.UseSqlite(connectionString));
-
-            services.AddScoped<ISearchResultsRepo, SearchResultsRepo>();
-            services.AddScoped<ISearchService, SearchService>();
-            services.AddScoped<ISearchResultsProvider, SearchResultsProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
