@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Repository;
+using Serilog;
 using Sympli.SEO.Common.Interfaces;
 using Sympli.SEO.Services;
 
@@ -61,8 +63,10 @@ namespace Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(this.Configuration).CreateLogger();
+
             app.UseSwagger();
 
             if (env.IsDevelopment())
@@ -71,7 +75,11 @@ namespace Api
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseSerilogRequestLogging(); 
+
             app.UseHttpsRedirection();
+
+            loggerFactory.AddSerilog();
 
             app.UseSwaggerUI(c =>
             {
